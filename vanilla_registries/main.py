@@ -81,6 +81,8 @@ class Files:
     items: Items
     commands: JsonFile
     blocks: Blocks
+    minecraft_nether: JsonFile
+    minecraft_overworld: JsonFile
 
 
 
@@ -91,7 +93,7 @@ class GeneratedData:
     reports: Path
     minecraft_version: str
 
-    files: Files
+    files: Files | None = None
 
     def __init__(self, ctx: Context):
         self.ctx = ctx
@@ -117,6 +119,7 @@ class GeneratedData:
 
         subprocess.run(args, cwd=self.save_path, check=True)
 
+    def refresh(self):
         with open(self.reports / "registries.json", "r") as f:
             registries = Registries(json.load(f))
         with open(self.reports / "packets.json") as f:
@@ -126,6 +129,8 @@ class GeneratedData:
         commands = JsonFile(source_path=self.reports / "commands.json")
         with open(self.reports / "blocks.json") as f:
             blocks = Blocks(json.load(f))
+        minecraft_nether = JsonFile(source_path=self.reports / "minecraft" / "nether.json")
+        minecraft_overworld = JsonFile(source_path=self.reports / "minecraft" / "overworld.json")
 
         self.files = Files(
             registries=registries,
@@ -133,12 +138,16 @@ class GeneratedData:
             items=items,
             commands=commands,
             blocks=blocks,
+            minecraft_nether=minecraft_nether,
+            minecraft_overworld=minecraft_overworld,
         )
     
     def ensure(self):
         if self.cache.json.get("minecraft_version") != self.minecraft_version:
             self.regen()
             self.cache.json["minecraft_version"] = self.minecraft_version
+        if self.files is None:
+            self.refresh()
         
     @property
     def registries(self) -> Registries:
@@ -165,5 +174,15 @@ class GeneratedData:
         self.ensure()
         return self.files.blocks
 
+    @property
+    def minecraft_nether(self) -> JsonFile:
+        self.ensure()
+        return self.files.minecraft_nether
+    
+    @property
+    def minecraft_overworld(self) -> JsonFile:
+        self.ensure()
+        return self.files.minecraft_overworld
+    
         
         
