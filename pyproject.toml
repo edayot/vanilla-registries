@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "vanilla-registries"
-version = "0.8.1"
+version = "0.1.0"
 description = ""
 authors = ["edayot"]
 license = "mit"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-beet=">=0.104.1"
+beet=">=0.108.1"
 requests = "^2.31.0"
 
 [tool.poetry.dev-dependencies]
