@@ -4,10 +4,12 @@ from beet.contrib.vanilla import Vanilla
 import subprocess
 import os
 import json
+from pydantic import BaseModel
+from typing import NotRequired
 
 
 
-class RegistryContainer(Container[str, set[str]]):
+class Registries(Container[str, set[str]]):
     def __init__(self, data: dict):
         super().__init__()
         for key, value in data.items():
@@ -17,8 +19,24 @@ class RegistryContainer(Container[str, set[str]]):
         return key if ":" in key else f"minecraft:{key}"
 
 
+
+class Packet(BaseModel):
+    clientbound: set[str]
+    serverbound: set[str]
+
+class Packets(Container[str, Packet]):
+    def __init__(self, data: dict):
+        super().__init__()
+        for key, value in data.items():
+            self[key] = Packet(
+                clientbound=set(value.get("clientbound", {}).keys()),
+                serverbound=set(value.get("serverbound", {}).keys()),
+            )
+
+
 class GeneratedData:
-    registries: RegistryContainer
+    registries: Registries
+    packets: Packets
 
     def __init__(self, ctx: Context):
         cache = ctx.cache["vanilla_registries"]
@@ -36,5 +54,7 @@ class GeneratedData:
         cache.json["generated"] = False
 
         with open(reports / "registries.json") as f:
-            self.registries = RegistryContainer(json.load(f))
+            self.registries = Registries(json.load(f))
+        with open(reports / "packets.json") as f:
+            self.packets = Packets(json.load(f))
 
