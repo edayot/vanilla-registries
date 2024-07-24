@@ -85,7 +85,6 @@ class Files:
     minecraft_overworld: JsonFile
 
 
-
 class GeneratedData:
     ctx: Context
     cache: Cache
@@ -102,12 +101,10 @@ class GeneratedData:
         self.save_path = self.cache.directory / "generated"
         self.reports = self.save_path / "generated" / "reports"
         self.minecraft_version = self.vanilla.minecraft_version
-    
+
     def regen(self):
         release = self.vanilla.releases[self.minecraft_version]
-        jar = release.cache.download(
-            release.info.data["downloads"]["server"]["url"]
-        )
+        jar = release.cache.download(release.info.data["downloads"]["server"]["url"])
         os.makedirs(self.save_path, exist_ok=True)
         args = [
             "java",
@@ -129,8 +126,12 @@ class GeneratedData:
         commands = JsonFile(source_path=self.reports / "commands.json")
         with open(self.reports / "blocks.json") as f:
             blocks = Blocks(json.load(f))
-        minecraft_nether = JsonFile(source_path=self.reports / "minecraft" / "nether.json")
-        minecraft_overworld = JsonFile(source_path=self.reports / "minecraft" / "overworld.json")
+        minecraft_nether = JsonFile(
+            source_path=self.reports / "minecraft" / "nether.json"
+        )
+        minecraft_overworld = JsonFile(
+            source_path=self.reports / "minecraft" / "overworld.json"
+        )
 
         self.files = Files(
             registries=registries,
@@ -141,34 +142,34 @@ class GeneratedData:
             minecraft_nether=minecraft_nether,
             minecraft_overworld=minecraft_overworld,
         )
-    
+
     def ensure(self):
         if self.cache.json.get("minecraft_version") != self.minecraft_version:
             self.regen()
             self.cache.json["minecraft_version"] = self.minecraft_version
         if self.files is None:
             self.refresh()
-        
+
     @property
     def registries(self) -> Registries:
         self.ensure()
         return self.files.registries
-    
+
     @property
     def packets(self) -> Packets:
         self.ensure()
         return self.files.packets
-    
+
     @property
     def items(self) -> Items:
         self.ensure()
         return self.files.items
-    
+
     @property
     def commands(self) -> JsonFile:
         self.ensure()
         return self.files.commands
-    
+
     @property
     def blocks(self) -> Blocks:
         self.ensure()
@@ -178,11 +179,8 @@ class GeneratedData:
     def minecraft_nether(self) -> JsonFile:
         self.ensure()
         return self.files.minecraft_nether
-    
+
     @property
     def minecraft_overworld(self) -> JsonFile:
         self.ensure()
         return self.files.minecraft_overworld
-    
-        
-        
