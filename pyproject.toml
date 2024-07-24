@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "vanilla-registries"
+version = "0.8.1"
+description = ""
+authors = ["edayot"]
+license = "mit"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+beet=">=0.104.1"
+requests = "^2.31.0"
+
+[tool.poetry.dev-dependencies]
+black = "^24.4.2"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pyright]
+typeCheckingMode = "basic"
